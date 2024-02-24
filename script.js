@@ -106,7 +106,7 @@ function asignarCalificacion() {
     const materiaSeleccionada = document.getElementById('materiasCal').value;
     const calificacion = parseFloat(document.getElementById('calificacion').value);
     const alumnosArray = obtenerAlumnos();
-    const indiceAlumno = obtenerIndiceAlumno(alumnosArray);
+    const indiceAlumno = alumnosArray.findIndex(a => a.nombre === alumnoSeleccionado.nombre && a.apellidos === alumnoSeleccionado.apellidos && a.edad === alumnoSeleccionado.edad);
     console.log(indiceAlumno);
 
     if (indiceAlumno !== -1) {
@@ -118,8 +118,8 @@ function asignarCalificacion() {
     }
 }
 
-function obtenerIndiceAlumno(alumnosArray) {
-    return alumnosArray.findIndex(a => a.nombre === alumnoSeleccionado.nombre && a.apellidos === alumnoSeleccionado.apellidos && a.edad === alumnoSeleccionado.edad);
+function obtenerIndiceAlumno(alumno) {
+    
 }
 
 function actualizarAlumno(alumnosArray) {
