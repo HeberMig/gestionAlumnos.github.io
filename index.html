@@ -17,9 +17,19 @@
             <button onclick="altaAlumno()">Dar de Alta</button>
         </div>
         <div id="materias" class="section">
-            <h2>Inscribir Materia</h2>
+            <h2>Crear clases</h2>
             <input type="text" id="materiaNombre" placeholder="Nombre de la Materia">
-            <button onclick="inscribirMateria()">Inscribir Materia</button>
+            <button onclick="crearClase()">Inscribir Materia</button>
+        </div>
+        <div id="inscripcion" class="section">
+            <h2>Inscribir alumno a una clase</h2>
+            <select id="alumnosInscripcion">
+                <!-- Opciones de alumnos -->
+            </select>
+            <select id="materiasInscripcion">
+                <!-- Opciones de materias -->
+            </select>
+            <button onclick="asignarClase()">Inscribir</button>
         </div>
         <div id="calificaciones" class="section">
             <h2>Asignar Calificaciones</h2>

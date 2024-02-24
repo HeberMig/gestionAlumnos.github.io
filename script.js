@@ -1,26 +1,59 @@
-class Materia{
-    constructor(nombre, calificacion){
-        this.nombre = nombre;
-        this.calificacion = calificacion;
+function Alumno(nombre, apellidos, edad){    
+    this.nombre = nombre;
+    this.apellidos = apellidos;
+    this.edad = edad;
+    this.materias = [];
+}
+
+Alumno.prototype.guardarCalificacion = function(materiaNombre, calificacion){
+    const result = this.validarMateria(materiaNombre);
+    if (result !== -1) {
+        this.materias[result].calificacion = calificacion;
+    } else{
+        console.log("No se encontró la materia ", materiaNombre);
     }
 }
 
-class Alumno{
-    constructor(nombre, apellidos, edad){
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.edad = edad;
-        this.materias = []; 
-    }
-    saveGrade(materiaNombre, calificacion){
-        const materia = new Materia(materiaNombre, calificacion);
+Alumno.prototype.inscribirMateria = function (materia) {
+    const result = this.validarMateria(materia.nombre);
+    console.log("Alumno validacion materia: ", result);
+    if (result == -1){
         this.materias.push(materia);
+    } else{
+        console.log("El alumno ya está inscrito a ", materia.nombre);
     }
 }
 
-// function Materia(nombre) {
-//     this.nombre = nombre;
-// }
+Alumno.prototype.validarMateria = function (materiaNombre){
+    return this.materias.findIndex(m => m.nombre === materiaNombre);
+}
+
+function Materia(nombre){
+    this.nombre = nombre;
+    this.calificacion = null;
+}
+
+function Clase(nombre){
+    this.nombre = nombre;
+    this.alumnosInscritos = [];
+}
+
+//Función para agregar alumnos a una clase
+Clase.prototype.agregarAlumno = function (nuevoAlumno) {
+    //Si el alumno no existe, se agrega a la lista
+    const result = this.validarAlumno(nuevoAlumno);
+    console.log("clase valida alumno: ", result);
+    if (result == -1) {
+        this.alumnosInscritos.push(nuevoAlumno);        
+    } else{
+        console.log(`${nuevoAlumno.nombre} ya está inscrit@ a la clase de ${this.nombre}`);
+    }
+}
+
+//Función para saber si el alumno existe o no en la lista de alumnos inscritos
+Clase.prototype.validarAlumno = function (alumno) {
+    return this.alumnosInscritos.findIndex(a => a.nombre === alumno.nombre && a.apellidos === alumno.apellidos && a.edad === alumno.edad);
+}
 
 function guardarAlumno(alumno) {
     let alumnosArray = JSON.parse(localStorage.getItem('alumnos')) || [];
@@ -28,10 +61,10 @@ function guardarAlumno(alumno) {
     localStorage.setItem('alumnos', JSON.stringify(alumnosArray));
 }
 
-function guardarMateria(materia) {
-    let materias = JSON.parse(localStorage.getItem('materias')) || [];
-    materias.push(materia);
-    localStorage.setItem('materias', JSON.stringify(materias));
+function guardarClase(clase) {
+    let clasesArray = JSON.parse(localStorage.getItem('clases')) || [];
+    clasesArray.push(clase);
+    localStorage.setItem('clases', JSON.stringify(clasesArray));
 }
 
 function obtenerAlumnos() {
@@ -45,8 +78,14 @@ function obtenerAlumnos() {
 }
 
 
-function obtenerMaterias() {
-    return JSON.parse(localStorage.getItem('materias')) || [];
+function obtenerClases() {
+    const clasesGuardadas = JSON.parse(localStorage.getItem("clases")) || [];
+    return clasesGuardadas.map(clase => {
+        const {nombre, alumnosInscritos} = clase;
+        const nuevaClase = new Clase(nombre);
+        nuevaClase.alumnosInscritos = alumnosInscritos;
+        return nuevaClase;
+    })
 }
 
 function altaAlumno() {
@@ -56,17 +95,45 @@ function altaAlumno() {
 
     const alumno = new Alumno(nombre, apellidos, edad);
     guardarAlumno(alumno);
-    mostrarAlumnos();
+    mostrarAlumnosInscripcion();
+    mostrarAlumnosCal();
 }
 
-function inscribirMateria() {
-    const materiaNombre = document.getElementById('materiaNombre').value;
-    const materia = new Materia(materiaNombre);
-    guardarMateria(materia);
-    mostrarMateriasCal();
+function crearClase() {
+    const claseNombre = document.getElementById('materiaNombre').value;
+    const clase = new Clase(claseNombre);
+    guardarClase(clase);
+    mostrarClasesInscripcion();
+    mostrarClasesCal();
 }
 
-function mostrarAlumnos() {
+function mostrarAlumnosInscripcion() {
+    const alumnos = obtenerAlumnos();
+    const selectAlumnosInscripcion = document.getElementById('alumnosInscripcion');
+    selectAlumnosInscripcion.innerHTML = '';
+
+    alumnos.forEach(alumno => {
+        const option = document.createElement('option');
+        option.text = `${alumno.nombre} ${alumno.apellidos}`;
+        option.value = JSON.stringify(alumno);
+        selectAlumnosInscripcion.appendChild(option);
+    });
+}
+
+function mostrarClasesInscripcion() {
+    const clases = obtenerClases();
+    const selectClasesInscripcion = document.getElementById('materiasInscripcion');
+    selectClasesInscripcion.innerHTML = '';
+
+    clases.forEach(clase => {
+        const option = document.createElement('option');
+        option.text = clase.nombre;
+        option.value = clase.nombre;
+        selectClasesInscripcion.appendChild(option);
+    });
+}
+
+function mostrarAlumnosCal() {
     const alumnos = obtenerAlumnos();
     const selectAlumnosCal = document.getElementById('alumnosCal');
     selectAlumnosCal.innerHTML = '';
@@ -81,8 +148,8 @@ function mostrarAlumnos() {
     //mostrarMateriasPromedio();
 }
 
-function mostrarMateriasCal() {
-    const materias = obtenerMaterias();
+function mostrarClasesCal() {
+    const materias = obtenerClases();
     const selectMateriasCal = document.getElementById('materiasCal');
     selectMateriasCal.innerHTML = '';
 
@@ -101,31 +168,61 @@ function calcularPromedioAlumno(alumno) {
     return sumaCalificaciones / calificaciones.length;
 }
 
-function asignarCalificacion() {
-    const alumnoSeleccionado = JSON.parse(document.getElementById('alumnosCal').value);
-    const materiaSeleccionada = document.getElementById('materiasCal').value;
-    const calificacion = parseFloat(document.getElementById('calificacion').value);
-    const alumnosArray = obtenerAlumnos();
-    const indiceAlumno = alumnosArray.findIndex(a => a.nombre === alumnoSeleccionado.nombre && a.apellidos === alumnoSeleccionado.apellidos && a.edad === alumnoSeleccionado.edad);
-    console.log(indiceAlumno);
+function asignarClase() {
+    const alumnoSeleccionado = JSON.parse(document.getElementById("alumnosInscripcion").value);
+    const materiaSeleccionada = document.getElementById("materiasInscripcion").value;
+    const nuevaMateria = new Materia(materiaSeleccionada);
 
-    if (indiceAlumno !== -1) {
-        alumnosArray[indiceAlumno].saveGrade(materiaSeleccionada, calificacion);
+    const alumnosArray = obtenerAlumnos();
+    const clasesArray = obtenerClases();
+    
+    const indiceAlumno = obtenerIndiceAlumno(alumnosArray, alumnoSeleccionado);
+
+    const indiceClase = clasesArray.findIndex(c => c.nombre === materiaSeleccionada);
+    console.log(indiceClase);
+
+    if (indiceAlumno!== -1 && indiceClase !== -1) {
+        alumnosArray[indiceAlumno].inscribirMateria(nuevaMateria);
+        clasesArray[indiceClase].agregarAlumno(alumnosArray[indiceAlumno]);
         actualizarAlumno(alumnosArray);
+        actualizarClase(clasesArray);
         console.log(alumnosArray[indiceAlumno]);
+        console.log(clasesArray);
     } else {
         alert("Error: No se pudo encontrar al alumno.");
     }
 }
 
-function obtenerIndiceAlumno(alumno) {
-    
+function asignarCalificacion() {
+    const alumnoSeleccionado = JSON.parse(document.getElementById('alumnosCal').value);
+    const materiaSeleccionada = document.getElementById('materiasCal').value;
+    const calificacion = parseFloat(document.getElementById('calificacion').value);
+
+    const alumnosArray = obtenerAlumnos();
+
+    const indiceAlumno = obtenerIndiceAlumno(alumnosArray, alumnoSeleccionado);
+
+    if (indiceAlumno !== -1 && calificacion >= 0) {
+        alumnosArray[indiceAlumno].guardarCalificacion(materiaSeleccionada, calificacion);
+        actualizarAlumno(alumnosArray);
+        console.log(alumnosArray[indiceAlumno]);
+    } else if (indiceAlumno == -1) {
+        alert("Error: No se pudo encontrar al alumno.");
+    } else {
+        console.log("La calificación no puede ser menor a 0");
+    }
+}
+
+function obtenerIndiceAlumno(alumnosArray, alumnoSeleccionado) {
+    return alumnosArray.findIndex(a => a.nombre === alumnoSeleccionado.nombre && a.apellidos === alumnoSeleccionado.apellidos && a.edad === alumnoSeleccionado.edad);    
 }
 
 function actualizarAlumno(alumnosArray) {
-    // const alumnosArray = obtenerAlumnos();
-    // alumnosArray[indice] = alumno;
     localStorage.setItem('alumnos', JSON.stringify(alumnosArray));
+}
+
+function actualizarClase(clasesArray) {
+    localStorage.setItem('clases', JSON.stringify(clasesArray));
 }
 
 function obtenerPromedioAlumnos() {
@@ -195,9 +292,11 @@ function ordenarAlumnosDescendente() {
 
 function borrarDatos() {
     localStorage.removeItem('alumnos');
-    localStorage.removeItem('materias');
-    mostrarAlumnos();
-    mostrarMateriasCal();
+    localStorage.removeItem('clases');
+    mostrarAlumnosInscripcion();
+    mostrarClasesInscripcion();
+    mostrarAlumnosCal();
+    mostrarClasesCal();
     //mostrarMateriasPromedio();
 }
 
@@ -239,8 +338,8 @@ function mostrarResultados(resultados) {
     }
 }
 
-function obtenerMateriasPromedio() {
-    const materias = obtenerMaterias();
+function obtenerClasesPromedio() {
+    const materias = obtenerClases();
     const selectMateriasPromedio = document.getElementById('materiasPromedio');
     selectMateriasPromedio.innerHTML = '';
 
@@ -267,6 +366,11 @@ function obtenerPromedioMateria() {
     }
 }
 
-mostrarAlumnos();
-mostrarMateriasCal();
+//Se llaman a estas funciones para que cuando se recargue la página o se guarden cambios, los datos en los selectors del html se sigan mostrando
+
+mostrarAlumnosInscripcion();
+mostrarClasesInscripcion();
+mostrarAlumnosCal();
+mostrarClasesCal();
+
 //mostrarMateriasPromedio();
