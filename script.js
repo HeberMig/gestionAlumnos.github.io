@@ -10,7 +10,7 @@ Alumno.prototype.guardarCalificacion = function(materiaNombre, calificacion){
     if (result !== -1) {
         this.materias[result].calificacion = calificacion;
     } else{
-        console.log("No se encontró la materia ", materiaNombre);
+        console.log("El alumno no está inscrito a la materia ", materiaNombre);
     }
 }
 
@@ -28,9 +28,34 @@ Alumno.prototype.validarMateria = function (materiaNombre){
     return this.materias.findIndex(m => m.nombre === materiaNombre);
 }
 
+Alumno.prototype.calcularPromedio = function () {
+    const materiasInscritas = this.materias;
+
+    //contar las materias que sí tienen calificacion
+    let contador = 0;
+
+    // Variable que guardará la suma de todas las calificaciones del alumno.
+    const SumaCalificaciones = materiasInscritas.reduce((acumulador, materia) =>{
+        // condicion para solo sumar materias con calificacion
+        if (materia.calificacion !== null) {
+            contador++;
+            return acumulador + materia.calificacion;
+        } else {
+            return acumulador;
+        }
+    }, 0)
+    
+    const promedio = SumaCalificaciones/contador;
+    return promedio;
+}
+
 function Materia(nombre){
     this.nombre = nombre;
     this.calificacion = null;
+}
+
+Materia.prototype.isEmpty = function () {
+    return this.calificacion === 0;
 }
 
 function Clase(nombre){
@@ -161,13 +186,6 @@ function mostrarClasesCal() {
     });
 }
 
-function calcularPromedioAlumno(alumno) {
-    const calificaciones = alumno.calificaciones;
-    if (calificaciones.length === 0) return 0;
-    const sumaCalificaciones = calificaciones.reduce((total, calificacion) => total + calificacion, 0);
-    return sumaCalificaciones / calificaciones.length;
-}
-
 function asignarClase() {
     const alumnoSeleccionado = JSON.parse(document.getElementById("alumnosInscripcion").value);
     const materiaSeleccionada = document.getElementById("materiasInscripcion").value;
@@ -228,21 +246,29 @@ function actualizarClase(clasesArray) {
 function obtenerPromedioAlumnos() {
     const alumnos = obtenerAlumnos();
     const resultados = alumnos.map(alumno => {
-        const promedio = calcularPromedioAlumno(alumno);
-        return {
+        const promedio = alumno.calcularPromedio();
+        if (!isNaN(promedio)) {
+            return {
             nombre: alumno.nombre,
             apellidos: alumno.apellidos,
             promedio: promedio.toFixed(2)
-        };
-    });
+            };
+        }
+    }).filter(Boolean);//eliminar del array resultados a los elementos alumnos cuyo promedio es NaN
     mostrarPromedioAlumnos(resultados);
 }
 
 function mostrarPromedioAlumnos(resultados) {
     const resultadosDiv = document.getElementById('resultados');
-
+    
+    // eliminar tablas previas
+    let tablaDivElement = document.getElementById("tablaDiv");
+    if (tablaDivElement !== null) {
+        tablaDivElement.remove();
+    }
     // Crear un div para la tabla
     const tablaDiv = document.createElement('div');
+    tablaDiv.setAttribute("id", "tablaDiv");
 
     // Crear la tabla
     const table = document.createElement('table');
