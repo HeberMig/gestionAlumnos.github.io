@@ -72,8 +72,11 @@ button:hover {
 }
 
 #resultados {
-    text-align: center;
+    text-align: center;        
+}
 
+#promedioAlumnosResultados{
+    text-align: center;    
 }
 
 #busqueda {
