@@ -277,6 +277,7 @@ function buscarPorNombreApellido() {
 }
 
 function mostrarResultados(resultados) {
+    ocultarTablaDiv("promedioAlumnosResultados");
     const busquedaDiv = document.getElementById('busqueda');
     busquedaDiv.innerHTML = '';
 
@@ -321,13 +322,14 @@ function obtenerPromedioAlumnos() {
 }
 
 function mostrarPromedioAlumnos(resultados) {
-    const resultadosDiv = document.getElementById('resultados');
-    
+    ocultarTablaDiv("busqueda")
+    const promediosDiv = document.getElementById('promedioAlumnosResultados');
+    promediosDiv.innerHTML = "";
     // eliminar tablas previas
-    let tablaDivElement = document.getElementById("tablaDiv");
-    if (tablaDivElement !== null) {
-        tablaDivElement.remove();
-    }
+    // let tablaDivElement = document.getElementById("tablaDiv");
+    // if (tablaDivElement !== null) {
+    //     tablaDivElement.remove();
+    // }
     // Crear un div para la tabla
     const tablaDiv = document.createElement('div');
     tablaDiv.setAttribute("id", "tablaDiv");
@@ -355,7 +357,13 @@ function mostrarPromedioAlumnos(resultados) {
     tablaDiv.appendChild(table);
 
     // Agregar el div con la tabla al final del div "resultados"
-    resultadosDiv.appendChild(tablaDiv);
+    promediosDiv.appendChild(tablaDiv);
+}
+
+// Funcion para que no se muestren varias tablas al mismo tiempo
+function ocultarTablaDiv(id){
+    const div = document.getElementById(id);
+    div.innerHTML = "";
 }
 
 //Ordena alumnos por nombre
