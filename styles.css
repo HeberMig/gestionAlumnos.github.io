@@ -97,3 +97,14 @@ th {
     background-color: #f2f2f2;
     color: #333;
 }
+
+.error{
+    color: rgba(156, 60, 171, 0.935);
+    font-family: inherit;
+    font-weight: bold;
+    font-size: larger;
+}
+
+.oculto{
+    display: none;
+}
