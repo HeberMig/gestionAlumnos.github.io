@@ -331,6 +331,7 @@ function buscarPorNombreApellido() {
 
 function mostrarResultados(resultados) {
     ocultarTablaDiv("promedioAlumnosResultados");
+    ocultarTablaDiv("mostrarResultadosCalificacion");
     const busquedaDiv = document.getElementById('busqueda');
     busquedaDiv.innerHTML = '';
 
@@ -375,13 +376,13 @@ function obtenerPromedioAlumnos() {
 }
 
 function mostrarPromedioAlumnos(resultados) {
-    ocultarTablaDiv("busqueda")
+    ocultarTablaDiv("busqueda");
+    ocultarTablaDiv("mostrarResultadosCalificacion");
     const promediosDiv = document.getElementById('promedioAlumnosResultados');
     promediosDiv.innerHTML = "";
 
     // Crear un div para la tabla
     const tablaDiv = document.createElement('div');
-    tablaDiv.setAttribute("id", "tablaDiv");
 
     // Crear la tabla
     const table = document.createElement('table');
@@ -409,12 +410,6 @@ function mostrarPromedioAlumnos(resultados) {
     promediosDiv.appendChild(tablaDiv);
 }
 
-// Funcion para que no se muestren varias tablas al mismo tiempo
-function ocultarTablaDiv(id){
-    const div = document.getElementById(id);
-    div.innerHTML = "";
-}
-
 //Ordena alumnos por nombre
 function ordenarAlumnosAscendente() {
     const alumnos = obtenerAlumnos();
@@ -435,6 +430,91 @@ function ordenarAlumnosDescendente() {
         return nombreB.localeCompare(nombreA);
     });
     mostrarResultados(alumnos);
+}
+
+//Ordenar alumnos por calificacion
+//Funcion Ordenar por calificacion Ascendente
+function ordenarAlumnosCalificacionAscendente(){
+    //const alumnos = obtenerAlumnos().filter(alumno => alumno.materias.some(materia => materia.calificacion !== null));
+    const alumnos = obtenerAlumnos();
+    const resultados = alumnos.map(alumno => {
+        const promedio = alumno.calcularPromedio();
+        if (!isNaN(promedio)) {
+            return {
+            nombre: alumno.nombre,
+            apellidos: alumno.apellidos,
+            promedio: promedio.toFixed(2)
+            };
+        }
+    }).filter(Boolean);
+    resultados.sort((a, b) => {
+        const promedioA =  a.promedio;
+        const promedioB = b.promedio;
+        return promedioB - promedioA;
+    });
+    mostrarCalificacionAD(resultados);
+}
+//Funcion Ordenar por calificacion Descendente
+function ordenarAlumnosCalificacionDescendente(){
+    //const alumnos = obtenerAlumnos().filter(alumno => alumno.materias.some(materia => materia.calificacion !== null));
+    const alumnos = obtenerAlumnos();
+    const resultados = alumnos.map(alumno => {
+        const promedio = alumno.calcularPromedio();
+        if (!isNaN(promedio)) {
+            return {
+            nombre: alumno.nombre,
+            apellidos: alumno.apellidos,
+            promedio: promedio.toFixed(2)
+            };
+        }
+    }).filter(Boolean);
+    resultados.sort((a, b) => {
+        const promedioA =  a.promedio;
+        const promedioB = b.promedio;
+        return promedioA - promedioB;
+    });
+    mostrarCalificacionAD(resultados);
+}
+
+function mostrarCalificacionAD(resultados) {
+    ocultarTablaDiv("mostrarResultadosCalificacion");
+    ocultarTablaDiv("busqueda");
+    ocultarTablaDiv("promedioAlumnosResultados");
+    const resultadosDiv = document.getElementById('mostrarResultadosCalificacion');
+    resultadosDiv.innerHTML = "";
+    
+    // Crear un div para la tabla
+    const tablaDiv = document.createElement('div');
+
+    // Crear la tabla
+    const table = document.createElement('table');
+    table.innerHTML = `
+        <tr>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Calificacion</th>
+        </tr>
+    `;
+    resultados.forEach(alumno => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${alumno.nombre}</td>
+            <td>${alumno.apellidos}</td>
+            <td>${alumno.promedio}</td>
+        `;
+        table.appendChild(row);
+    });
+    // Agregar la tabla al div
+    tablaDiv.appendChild(table);
+
+    // Agregar el div con la tabla al final del div "resultados"
+    resultadosDiv.appendChild(tablaDiv);
+}
+
+// Funcion para que no se muestren varias tablas al mismo tiempo
+function ocultarTablaDiv(id){
+    const div = document.getElementById(id);
+    div.innerHTML = "";
 }
 
 function borrarDatos() {

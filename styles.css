@@ -79,6 +79,10 @@ button:hover {
     text-align: center;    
 }
 
+#mostrarResultadosCalificacion{
+    text-align: center;
+}
+
 #busqueda {
     margin-top: 10px;
 }
