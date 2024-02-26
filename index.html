@@ -57,12 +57,17 @@
             <button onclick="obtenerPromedioAlumnos()">Promedio de Alumnos</button>
             <button onclick="ordenarAlumnosAscendente()">Ordenar Alumnos (Ascendente)</button>
             <button onclick="ordenarAlumnosDescendente()">Ordenar Alumnos (Descendente)</button>
+            <button onclick="ordenarAlumnosCalificacionAscendente()">Ordenar Alumnos por Calificación &#9650</button>
+            <button onclick="ordenarAlumnosCalificacionDescendente()">Ordenar Alumnos por Calificación &#9660</button>
             <button onclick="borrarDatos()">Borrar Todos los Datos</button>
             <button onclick="location.reload()">Actualizar</button>
             <div id="busqueda"></div>
         </div>
         <div id="promedioAlumnosResultados" class="section">
             <!-- Aquí se mostrarán los resultados del promedio de alumnos -->
+        </div>
+        <div id="mostrarResultadosCalificacion" class="section">            
+            <!-- Aquí se mostrarán los resultados del ordenamiento por calificacion de alumnos -->
         </div>
     </div>
     <script src="script.js"></script>
